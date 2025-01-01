@@ -107,7 +107,7 @@ async function callOpenAI(
 	apiKey,
 	prompt,
 	systemPrompt,
-	model = "gpt-4",
+	model = "gpt-4o",
 	maxTokens = 3000
 ) {
 	const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -137,26 +137,73 @@ async function callOpenAI(
 
 // Multi-step LLM Processing
 async function brainstormImprovements(apiKey, originalPrompt) {
-	const systemPrompt = `You are an expert prompt analyst. Your task is to analyze the given prompt and provide specific suggestions for improvement. Focus on:
-1. Identifying unclear or ambiguous elements
-2. Suggesting additional context or constraints needed
-3. Recommending structural improvements
-4. Pointing out missing parameters or specifications
-5. Suggesting ways to make the prompt more specific and effective
+	const systemPrompt = `You are an expert prompt analyst and engineer. Your task is to analyze the given prompt and provide specific suggestions for improvement.
 
-Provide your analysis in a structured format that can be used by another AI to implement these improvements.`;
+<task>
+Analyze the prompt and provide detailed suggestions for improvement, focusing on:
+1. Clarity and directness
+2. Structural improvements using XML tags for organization
+3. Opportunities for examples (few-shot learning)
+4. Places where Chain of Thought reasoning would help
+5. Missing context or constraints
+6. Ways to make the prompt more specific and effective
+</task>
 
-	const userPrompt = `Analyze this prompt and suggest specific improvements:
-${originalPrompt}
-
-Provide your analysis in the following format:
+<output_format>
 {
-  "clarity_issues": [...],
-  "missing_context": [...],
-  "structural_improvements": [...],
-  "specificity_suggestions": [...],
-  "format_recommendations": [...]
-}`;
+  "clarity_improvements": [
+    {
+      "issue": "Description of unclear element",
+      "suggestion": "Clear and direct alternative"
+    }
+  ],
+  "structural_improvements": [
+    {
+      "current": "Current structure",
+      "suggested": "Suggested XML structure",
+      "reason": "Why this improves the prompt"
+    }
+  ],
+  "example_opportunities": [
+    {
+      "context": "Where an example would help",
+      "suggested_example": "Concrete example to include"
+    }
+  ],
+  "chain_of_thought_suggestions": [
+    {
+      "reasoning_point": "Where to add reasoning steps",
+      "suggested_prompt": "How to guide the model's thinking"
+    }
+  ],
+  "missing_context": [
+    {
+      "gap": "Missing information or context",
+      "addition": "What to add and why"
+    }
+  ],
+  "format_recommendations": [
+    {
+      "current": "Current format",
+      "improved": "Improved format with XML tags"
+    }
+  ]
+}
+</output_format>`;
+
+	const userPrompt = `<original_prompt>
+${originalPrompt}
+</original_prompt>
+
+<instructions>
+Please analyze this prompt and suggest improvements following the output format specified above. Focus on making the prompt:
+1. Clear and direct
+2. Well-structured with XML tags
+3. Enhanced with relevant examples where helpful
+4. Guided with chain-of-thought reasoning where appropriate
+5. Complete with all necessary context
+6. Specific and effective for the intended purpose
+</instructions>`;
 
 	return await callOpenAI(apiKey, userPrompt, systemPrompt);
 }
@@ -167,17 +214,50 @@ async function implementImprovements(
 	brainstormedImprovements,
 	outputFormat
 ) {
-	const systemPrompt = `You are an elite AI prompt engineer, specialized in crafting and refining prompts for optimal AI interaction. Use the provided analysis to transform the original prompt into a highly effective instruction set.
+	const systemPrompt = `You are an elite AI prompt engineer, specialized in crafting highly effective prompts. Your task is to transform the original prompt using the provided analysis and following Anthropic's best practices.
 
-Your output must be in ${outputFormat} format.`;
+<context>
+You have access to:
+1. The original prompt
+2. A detailed analysis of potential improvements
+3. The required output format: ${outputFormat}
+</context>
 
-	const userPrompt = `Original Prompt:
+<task>
+Transform the prompt following these principles:
+1. Be clear and direct in instructions
+2. Use XML tags for clear structure
+3. Include relevant examples (few-shot learning) where suggested
+4. Incorporate chain-of-thought guidance where recommended
+5. Add all suggested context and constraints
+6. Format the output as specified: ${outputFormat}
+</task>
+
+<output_requirements>
+1. The improved prompt must be in ${outputFormat} format
+2. Maintain clarity and directness
+3. Use XML tags for structure where appropriate
+4. Include all relevant examples and context
+5. Guide the model's thinking process
+</output_requirements>`;
+
+	const userPrompt = `<original_prompt>
 ${originalPrompt}
+</original_prompt>
 
-Analysis and Suggestions:
+<analysis>
 ${brainstormedImprovements}
+</analysis>
 
-Transform this prompt into a highly effective version, incorporating the suggested improvements.`;
+<instructions>
+Using the analysis above, transform this prompt into a highly effective version that:
+1. Implements all suggested improvements
+2. Follows Anthropic's best practices
+3. Uses clear XML structure
+4. Includes relevant examples
+5. Guides the thinking process
+6. Outputs in ${outputFormat} format
+</instructions>`;
 
 	return await callOpenAI(apiKey, userPrompt, systemPrompt);
 }
