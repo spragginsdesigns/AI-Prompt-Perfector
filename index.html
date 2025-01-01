@@ -7,9 +7,15 @@
   <title>AI Prompt Perfector</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <!-- Favicon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="icon" type="image/ico" href="favicon.ico" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
     @keyframes gradient {
       0% {
         background-position: 0% 50%;
@@ -24,10 +30,16 @@
       }
     }
 
-    .loader {
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    .gradient-bg {
+      background: linear-gradient(-45deg, #FF3366, #7B2FFE, #2F8FFE, #00FFCC);
       background-size: 400% 400%;
       animation: gradient 15s ease infinite;
+    }
+
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .typing::after {
@@ -46,6 +58,34 @@
         opacity: 0;
       }
     }
+
+    .hover-scale {
+      transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+      transform: scale(1.02);
+    }
+
+    .prompt-container {
+      transition: all 0.3s ease;
+    }
+
+    .notification-slide {
+      animation: slideIn 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
   </style>
   <script>
     tailwind.config = {
@@ -53,10 +93,11 @@
       theme: {
         extend: {
           colors: {
-            'vercel-dark': '#0D0D0D',
-            'vercel-light': '#E5E7EB',
-            'gradient-start': '#232526',
-            'gradient-end': '#414345'
+            'primary': '#7B2FFE',
+            'secondary': '#2F8FFE',
+            'accent': '#FF3366',
+            'background': '#0D1117',
+            'surface': '#161B22'
           },
         },
       },
@@ -64,257 +105,114 @@
   </script>
 </head>
 
-<body class="bg-gradient-to-r from-gradient-start to-gradient-end text-vercel-light min-h-screen flex flex-col">
-  <header class="p-6 border-b border-gray-700">
-    <h1 class="text-3xl font-bold text-center">AI Prompt Perfector</h1>
+<body class="bg-background text-gray-100 min-h-screen flex flex-col">
+  <div class="gradient-bg fixed inset-0 opacity-20"></div>
+
+  <header class="relative z-10 p-6 glass-effect">
+    <div class="container mx-auto flex items-center justify-between">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
+        AI Prompt Perfector
+      </h1>
+      <a href="https://spragginsdesigns.xyz" target="_blank" class="text-sm hover:text-accent transition-colors">
+        by Austin Spraggins
+      </a>
+    </div>
   </header>
 
-  <main class="flex-grow container mx-auto p-6">
-    <div class="mb-6">
-      <label for="api-key" class="block mb-2 text-sm font-medium">OpenAI API Key</label>
-      <input type="password" id="api-key" class="w-full p-2 bg-gray-800 rounded focus:ring-2 focus:ring-blue-600"
-        placeholder="Enter your OpenAI API key">
-      <button id="save-key"
-        class="mt-2 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition focus:ring-2 focus:ring-blue-600">Save
-        API
-        Key</button>
+  <main class="relative z-10 flex-grow container mx-auto p-6 space-y-8">
+    <div class="glass-effect rounded-xl p-6 hover-scale">
+      <div class="flex items-center space-x-4 mb-4">
+        <i class="fas fa-key text-accent"></i>
+        <label for="api-key" class="text-lg font-medium">OpenAI API Key</label>
+      </div>
+      <div class="flex space-x-4">
+        <input type="password" id="api-key"
+          class="flex-grow p-3 rounded-lg bg-surface border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent transition-all"
+          placeholder="Enter your OpenAI API key">
+        <button id="save-key"
+          class="px-6 py-3 bg-accent rounded-lg hover:bg-opacity-80 transition-all focus:ring-2 focus:ring-accent focus:ring-opacity-50">
+          <i class="fas fa-save mr-2"></i>Save
+        </button>
+      </div>
     </div>
 
-    <div class="mb-6">
-      <label for="prompt" class="block mb-2 text-sm font-medium">Enter your original prompt</label>
-      <textarea id="prompt" rows="5" class="w-full p-2 bg-gray-800 rounded focus:ring-2 focus:ring-blue-600"
-        placeholder="Enter your prompt here"></textarea>
-      <div class="mt-2 flex justify-between items-center">
-        <span id="char-count" class="text-sm text-gray-400">0 / 4000 characters</span>
-        <button id="clear-prompt"
-          class="px-3 py-1 bg-red-600 rounded hover:bg-red-700 transition focus:ring-2 focus:ring-red-600">Clear</button>
+    <div class="glass-effect rounded-xl p-6 hover-scale">
+      <div class="flex items-center space-x-4 mb-4">
+        <i class="fas fa-code text-secondary"></i>
+        <label class="text-lg font-medium">Output Format</label>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="radio" name="output-format" value="plain" class="text-accent" checked>
+          <span>Plain Text</span>
+        </label>
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="radio" name="output-format" value="markdown" class="text-accent">
+          <span>Markdown</span>
+        </label>
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="radio" name="output-format" value="json" class="text-accent">
+          <span>JSON</span>
+        </label>
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="radio" name="output-format" value="xml" class="text-accent">
+          <span>XML</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass-effect rounded-xl p-6 hover-scale">
+        <div class="flex items-center space-x-4 mb-4">
+          <i class="fas fa-pencil-alt text-secondary"></i>
+          <label for="prompt" class="text-lg font-medium">Original Prompt</label>
+        </div>
+        <textarea id="prompt" rows="8"
+          class="w-full p-3 bg-surface rounded-lg border border-gray-700 focus:border-secondary focus:ring-1 focus:ring-secondary transition-all resize-none"
+          placeholder="Enter your prompt here"></textarea>
+        <div class="mt-4 flex justify-between items-center">
+          <span id="char-count" class="text-sm text-gray-400">0 characters</span>
+          <button id="clear-prompt" class="px-4 py-2 text-sm bg-surface rounded-lg hover:bg-gray-800 transition-all">
+            <i class="fas fa-trash-alt mr-2"></i>Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-effect rounded-xl p-6 hover-scale">
+        <div class="flex items-center space-x-4 mb-4">
+          <i class="fas fa-magic text-primary"></i>
+          <label class="text-lg font-medium">Perfected Prompt</label>
+        </div>
+        <div id="result-container" class="hidden h-full">
+          <pre id="result"
+            class="w-full h-[calc(100%-4rem)] p-3 bg-surface rounded-lg border border-gray-700 overflow-auto whitespace-pre-wrap"></pre>
+          <div class="mt-4 flex justify-between">
+            <button id="regenerate-prompt" class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">
+              <i class="fas fa-sync-alt mr-2"></i>Regenerate
+            </button>
+            <button id="copy-result" class="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-80 transition-all">
+              <i class="fas fa-copy mr-2"></i>Copy
+            </button>
+          </div>
+        </div>
+        <div id="loader" class="hidden h-full flex flex-col items-center justify-center">
+          <div class="loader w-16 h-16 rounded-full gradient-bg"></div>
+          <p id="loading-text" class="mt-4 text-lg typing"></p>
+        </div>
       </div>
     </div>
 
     <button id="perfect-prompt"
-      class="w-full px-4 py-2 bg-green-600 rounded hover:bg-green-700 transition focus:ring-2 focus:ring-green-600">Perfect
-      Prompt</button>
-
-    <div id="loader" class="hidden mt-6">
-      <div class="loader w-full h-2 rounded-full"></div>
-      <p class="mt-2 text-center typing">Perfecting your prompt</p>
-    </div>
-
-    <div id="result-container" class="mt-6 hidden">
-      <h2 class="text-xl font-semibold mb-2">Perfected Prompt:</h2>
-      <pre id="result" class="w-full p-4 bg-gray-800 rounded whitespace-pre-wrap"></pre>
-      <div class="mt-4 flex justify-between">
-        <button id="regenerate-prompt"
-          class="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700 transition focus:ring-2 focus:ring-yellow-600">Regenerate
-          Prompt</button>
-        <button id="copy-result"
-          class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition focus:ring-2 focus:ring-blue-600">Copy to
-          Clipboard</button>
-      </div>
-    </div>
+      class="w-full p-4 gradient-bg rounded-xl font-medium text-lg hover:opacity-90 transition-all focus:ring-2 focus:ring-accent focus:ring-opacity-50">
+      <i class="fas fa-wand-magic-sparkles mr-2"></i>Perfect My Prompt
+    </button>
   </main>
 
-  <footer class="p-6 border-t border-gray-700 text-center">
-    <p>Created by Austin Spraggins (<a href="https://spragginsdesigns.xyz"
-        class="text-blue-400 hover:underline">spragginsdesigns.xyz</a>)</p>
-  </footer>
-
-  <!-- Notification Container -->
   <div id="notification"
-    class="fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0">
+    class="fixed bottom-4 right-4 max-w-md p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0 z-50">
   </div>
 
-  <script>
-    function encrypt(text) {
-      return CryptoJS.AES.encrypt(text, 'your-secret-key').toString();
-    }
-
-    function decrypt(ciphertext) {
-      const bytes = CryptoJS.AES.decrypt(ciphertext, 'your-secret-key');
-      return bytes.toString(CryptoJS.enc.Utf8);
-    }
-
-    async function fetchApiKey() {
-      try {
-        const response = await fetch('/api-key');
-        const data = await response.json();
-        if (data.apiKey) {
-          localStorage.setItem('openaiApiKey', encrypt(data.apiKey));
-        } else {
-          throw new Error('API key not found');
-        }
-      } catch (error) {
-        console.error('Failed to fetch API key:', error);
-        showNotification('Failed to fetch API key', 'error');
-      }
-    }
-
-    function getApiKey() {
-      const encryptedApiKey = localStorage.getItem('openaiApiKey');
-      if (encryptedApiKey) {
-        return decrypt(encryptedApiKey);
-      }
-      return null;
-    }
-
-    function showNotification(message, type = 'success') {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.classList.remove('translate-y-20', 'opacity-0', 'bg-green-500', 'bg-red-500');
-      notification.classList.add('translate-y-0', 'opacity-100', type === 'success' ? 'bg-green-500' : 'bg-red-500');
-      setTimeout(() => {
-        notification.classList.remove('translate-y-0', 'opacity-100');
-        notification.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!localStorage.getItem('openaiApiKey')) {
-        fetchApiKey();
-      }
-
-      const apiKeyInput = document.getElementById('api-key');
-      apiKeyInput.value = getApiKey() || '';
-    });
-
-    const saveKeyButton = document.getElementById('save-key');
-    saveKeyButton.addEventListener('click', () => {
-      const apiKeyInput = document.getElementById('api-key').value;
-      if (apiKeyInput.trim() === '') {
-        showNotification('Please enter a valid API key', 'error');
-      } else {
-        localStorage.setItem('openaiApiKey', encrypt(apiKeyInput));
-        showNotification('API key saved successfully!', 'success');
-      }
-    });
-
-    const promptInput = document.getElementById('prompt');
-    const charCount = document.getElementById('char-count');
-    const clearPromptButton = document.getElementById('clear-prompt');
-    const perfectPromptButton = document.getElementById('perfect-prompt');
-    const resultDisplay = document.getElementById('result');
-    const loader = document.getElementById('loader');
-    const resultContainer = document.getElementById('result-container');
-    const regeneratePromptButton = document.getElementById('regenerate-prompt');
-    const copyResultButton = document.getElementById('copy-result');
-
-    promptInput.addEventListener('input', () => {
-      const count = promptInput.value.length;
-      charCount.textContent = `${count} / 4000 characters`;
-      charCount.classList.toggle('text-red-500', count > 4000);
-    });
-
-    clearPromptButton.addEventListener('click', () => {
-      promptInput.value = '';
-      charCount.textContent = '0 / 4000 characters';
-      charCount.classList.remove('text-red-500');
-    });
-
-    async function perfectPrompt() {
-      const apiKey = getApiKey();
-      const prompt = promptInput.value;
-
-      if (!apiKey) {
-        showNotification('Please enter your OpenAI API key', 'error');
-        return;
-      }
-
-      if (!prompt) {
-        showNotification('Please enter a prompt to perfect', 'error');
-        return;
-      }
-
-      if (prompt.length > 4000) {
-        showNotification('Your prompt is too long. Please shorten it to 4000 characters or less', 'error');
-        return;
-      }
-
-      loader.classList.remove('hidden');
-      resultContainer.classList.add('hidden');
-
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'system',
-                content: `You are an elite AI prompt engineer, specialized in crafting and refining prompts for optimal AI interaction. Your expertise lies in transforming basic prompts into highly effective, tailored instructions that maximize AI comprehension and output quality.
-
-Your responsibilities include:
-1. Analyzing the intent and context of the original prompt
-2. Identifying areas for improvement, including clarity, specificity, and comprehensiveness
-3. Restructuring and expanding the prompt to enhance its effectiveness
-4. Incorporating relevant background information and context
-5. Specifying desired output formats, length, and style
-6. Clarifying any ambiguities or vague instructions
-7. Adding constraints or guidelines to focus the AI's response
-8. Incorporating examples or analogies when beneficial
-9. Ensuring the prompt is ethically sound and avoids potential biases
-10. Optimizing the language for the target AI model (e.g., GPT-4)
-
-Your goal is to create a prompt that will yield the most accurate, relevant, and helpful response from an AI system, regardless of the subject matter or complexity of the task.`
-              },
-              {
-                role: 'user',
-                content: `Enhance and perfect the following prompt to maximize its effectiveness for AI interaction:
-
-Original Prompt:
-${prompt}
-
-Your task:
-1. Analyze the original prompt and identify its core purpose and any implicit assumptions.
-2. Expand and restructure the prompt to be more comprehensive, clear, and specific.
-3. Add necessary context, background information, or constraints that would help the AI better understand and respond to the prompt.
-4. Specify the desired output format, style, length, or any other relevant parameters.
-5. Clarify any ambiguities or vague instructions in the original prompt.
-6. If applicable, provide examples or analogies to illustrate the expected response.
-7. Ensure the prompt is ethically sound and free from potential biases.
-8. Optimize the language and structure for the GPT-4 model.
-
-Provide only the perfected prompt in your response, without any additional explanations or commentary. The perfected prompt should be a self-contained instruction set that can be used directly with an AI model.`
-              }
-            ],
-            max_tokens: 1000
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error?.message || 'API request failed');
-        }
-
-        const data = await response.json();
-        resultDisplay.textContent = data.choices[0].message.content;
-        resultContainer.classList.remove('hidden');
-        showNotification('Prompt perfected successfully!', 'success');
-      } catch (error) {
-        console.error('Error:', error);
-        resultDisplay.textContent = `An error occurred: ${error.message}. Please check your API key and try again.`;
-        resultContainer.classList.remove('hidden');
-        showNotification('Failed to perfect prompt. Please try again.', 'error');
-      } finally {
-        loader.classList.add('hidden');
-      }
-    }
-
-    perfectPromptButton.addEventListener('click', perfectPrompt);
-    regeneratePromptButton.addEventListener('click', perfectPrompt);
-
-    copyResultButton.addEventListener('click', () => {
-      navigator.clipboard.writeText(resultDisplay.textContent)
-        .then(() => showNotification('Perfected prompt copied to clipboard!', 'success'))
-        .catch(err => {
-          console.error('Failed to copy text: ', err);
-          showNotification('Failed to copy text. Please try again.', 'error');
-        });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 
 </html>
