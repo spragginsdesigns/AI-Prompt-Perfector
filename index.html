@@ -115,17 +115,18 @@
 <body class="bg-background text-gray-100 min-h-screen flex flex-col">
   <div class="gradient-bg fixed inset-0 opacity-20"></div>
 
-  <header class="relative z-10 p-6 glass-effect">
-    <div class="container mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-8">
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
+  <header class="relative z-10 p-4 sm:p-6 glass-effect">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+      <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-8">
+        <h1
+          class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent text-center sm:text-left">
           AI Prompt Perfector
         </h1>
         <nav class="flex space-x-4">
-          <a href="index.html" class="px-4 py-2 rounded-lg bg-surface transition-colors">
+          <a href="index.html" class="px-4 py-2 rounded-lg bg-surface transition-colors text-sm sm:text-base">
             <i class="fas fa-magic mr-2"></i>Perfector
           </a>
-          <a href="library.html" class="px-4 py-2 rounded-lg hover:bg-surface transition-colors">
+          <a href="library.html" class="px-4 py-2 rounded-lg hover:bg-surface transition-colors text-sm sm:text-base">
             <i class="fas fa-book mr-2"></i>Library
           </a>
         </nav>
@@ -136,18 +137,18 @@
     </div>
   </header>
 
-  <main class="relative z-10 flex-grow container mx-auto p-6 space-y-8">
-    <div class="glass-effect rounded-xl p-6 hover-scale">
+  <main class="relative z-10 flex-grow container mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
+    <div class="glass-effect rounded-xl p-4 sm:p-6 hover-scale">
       <div class="flex items-center space-x-4 mb-4">
         <i class="fas fa-key text-accent"></i>
-        <label for="api-key" class="text-lg font-medium">OpenAI API Key</label>
+        <label for="api-key" class="text-base sm:text-lg font-medium">OpenAI API Key</label>
       </div>
-      <div class="flex space-x-4">
+      <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
         <input type="password" id="api-key"
           class="flex-grow p-3 rounded-lg bg-surface border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent transition-all"
           placeholder="Enter your OpenAI API key">
         <button id="save-key"
-          class="px-6 py-3 bg-accent rounded-lg hover:bg-opacity-80 transition-all focus:ring-2 focus:ring-accent focus:ring-opacity-50">
+          class="px-6 py-3 bg-accent rounded-lg hover:bg-opacity-80 transition-all focus:ring-2 focus:ring-accent focus:ring-opacity-50 whitespace-nowrap">
           <i class="fas fa-save mr-2"></i>Save
         </button>
       </div>
@@ -178,18 +179,19 @@
       </div>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="glass-effect rounded-xl p-6 hover-scale">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      <div class="glass-effect rounded-xl p-4 sm:p-6 hover-scale">
         <div class="flex items-center space-x-4 mb-4">
           <i class="fas fa-pencil-alt text-secondary"></i>
-          <label for="prompt" class="text-lg font-medium">Original Prompt</label>
+          <label for="prompt" class="text-base sm:text-lg font-medium">Original Prompt</label>
         </div>
         <textarea id="prompt" rows="8"
           class="w-full p-3 bg-surface rounded-lg border border-gray-700 focus:border-secondary focus:ring-1 focus:ring-secondary transition-all resize-none"
           placeholder="Enter your prompt here"></textarea>
-        <div class="mt-4 flex justify-between items-center">
+        <div class="mt-4 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
           <span id="char-count" class="text-sm text-gray-400">0 characters</span>
-          <button id="clear-prompt" class="px-4 py-2 text-sm bg-surface rounded-lg hover:bg-gray-800 transition-all">
+          <button id="clear-prompt"
+            class="w-full sm:w-auto px-4 py-2 text-sm bg-surface rounded-lg hover:bg-gray-800 transition-all">
             <i class="fas fa-trash-alt mr-2"></i>Clear
           </button>
         </div>
@@ -203,15 +205,18 @@
         <div id="result-container" class="hidden h-full">
           <pre id="result"
             class="w-full h-[calc(100%-4rem)] p-3 bg-surface rounded-lg border border-gray-700 overflow-auto whitespace-pre-wrap"></pre>
-          <div class="mt-4 flex justify-between">
-            <button id="regenerate-prompt" class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">
+          <div class="mt-4 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
+            <button id="regenerate-prompt"
+              class="w-full sm:w-auto px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">
               <i class="fas fa-sync-alt mr-2"></i>Regenerate
             </button>
-            <div class="flex space-x-2">
-              <button id="save-to-library" class="px-4 py-2 bg-accent rounded-lg hover:bg-opacity-80 transition-all">
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+              <button id="save-to-library"
+                class="w-full sm:w-auto px-4 py-2 bg-accent rounded-lg hover:bg-opacity-80 transition-all">
                 <i class="fas fa-save mr-2"></i>Save to Library
               </button>
-              <button id="copy-result" class="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-80 transition-all">
+              <button id="copy-result"
+                class="w-full sm:w-auto px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-80 transition-all">
                 <i class="fas fa-copy mr-2"></i>Copy
               </button>
             </div>
