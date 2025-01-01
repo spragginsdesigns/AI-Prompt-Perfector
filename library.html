@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Library - AI Prompt Perfector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="icon" type="image/ico" href="favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#7B2FFE',
+            'secondary': '#2F8FFE',
+            'accent': '#FF3366',
+            'background': '#0D1117',
+            'surface': '#161B22'
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .gradient-bg {
+      background: linear-gradient(-45deg, #FF3366, #7B2FFE, #2F8FFE, #00FFCC);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hover-scale {
+      transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+      transform: scale(1.02);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    .animate-fade-out {
+      animation: fadeOut 0.2s ease-out forwards;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-gray-100 min-h-screen flex flex-col">
+  <div class="gradient-bg fixed inset-0 opacity-20"></div>
+
+  <header class="relative z-10 p-6 glass-effect">
+    <div class="container mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
+          Prompt Library
+        </h1>
+        <nav class="flex space-x-4">
+          <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-surface transition-colors">
+            <i class="fas fa-magic mr-2"></i>Perfector
+          </a>
+          <a href="library.html" class="px-4 py-2 rounded-lg bg-surface transition-colors">
+            <i class="fas fa-book mr-2"></i>Library
+          </a>
+        </nav>
+      </div>
+      <a href="https://spragginsdesigns.xyz" target="_blank" class="text-sm hover:text-accent transition-colors">
+        by Austin Spraggins
+      </a>
+    </div>
+  </header>
+
+  <main class="relative z-10 flex-grow container mx-auto p-6 space-y-8">
+    <!-- Import Section -->
+    <div class="glass-effect rounded-xl p-6 hover-scale">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+          <i class="fas fa-file-import text-accent text-2xl"></i>
+          <h2 class="text-xl font-semibold">Import Prompts</h2>
+        </div>
+        <div class="flex space-x-4">
+          <button id="import-file" class="px-4 py-2 bg-accent rounded-lg hover:bg-opacity-80 transition-all">
+            <i class="fas fa-upload mr-2"></i>Import File
+          </button>
+          <input type="file" id="file-input" accept=".md,.xml,.json,.txt" class="hidden" multiple>
+          <button id="create-prompt" class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">
+            <i class="fas fa-plus mr-2"></i>Create New
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-4">
+        <div class="p-4 bg-surface rounded-lg text-center">
+          <i class="fas fa-file-alt text-2xl mb-2 text-accent"></i>
+          <p class="text-sm">.txt</p>
+        </div>
+        <div class="p-4 bg-surface rounded-lg text-center">
+          <i class="fas fa-file-code text-2xl mb-2 text-accent"></i>
+          <p class="text-sm">.xml</p>
+        </div>
+        <div class="p-4 bg-surface rounded-lg text-center">
+          <i class="fas fa-file-code text-2xl mb-2 text-accent"></i>
+          <p class="text-sm">.json</p>
+        </div>
+        <div class="p-4 bg-surface rounded-lg text-center">
+          <i class="fab fa-markdown text-2xl mb-2 text-accent"></i>
+          <p class="text-sm">.md</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="flex space-x-4">
+      <div class="flex-grow">
+        <div class="relative">
+          <input type="text" id="search" placeholder="Search prompts..."
+            class="w-full p-3 pl-10 bg-surface rounded-lg border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent transition-all">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+      <div class="flex space-x-2">
+        <button class="px-4 py-2 bg-surface rounded-lg hover:bg-opacity-80 transition-all">
+          <i class="fas fa-filter mr-2"></i>Filter
+        </button>
+        <button class="px-4 py-2 bg-surface rounded-lg hover:bg-opacity-80 transition-all">
+          <i class="fas fa-sort mr-2"></i>Sort
+        </button>
+      </div>
+    </div>
+
+    <!-- Prompt Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="prompt-grid">
+      <!-- Prompt cards will be dynamically added here -->
+    </div>
+  </main>
+
+  <!-- Create/Edit Prompt Modal -->
+  <div id="prompt-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
+      <div class="glass-effect rounded-xl p-6 m-4">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-semibold">Create New Prompt</h3>
+          <button id="close-modal" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form id="prompt-form" class="space-y-4">
+          <div>
+            <label class="block mb-2">Title</label>
+            <input type="text" id="prompt-title" class="w-full p-3 bg-surface rounded-lg border border-gray-700"
+              required>
+          </div>
+          <div>
+            <label class="block mb-2">Description</label>
+            <textarea id="prompt-description" rows="2"
+              class="w-full p-3 bg-surface rounded-lg border border-gray-700"></textarea>
+          </div>
+          <div>
+            <label class="block mb-2">Author</label>
+            <input type="text" id="prompt-author" class="w-full p-3 bg-surface rounded-lg border border-gray-700"
+              placeholder="Your name" required>
+          </div>
+          <div>
+            <label class="block mb-2">Prompt Content</label>
+            <textarea id="prompt-content" rows="8"
+              class="w-full p-3 bg-surface rounded-lg border border-gray-700 font-mono" required></textarea>
+          </div>
+          <div>
+            <label class="block mb-2">Tags</label>
+            <input type="text" id="prompt-tags" class="w-full p-3 bg-surface rounded-lg border border-gray-700"
+              placeholder="Enter tags separated by commas">
+          </div>
+          <div class="flex justify-end space-x-4">
+            <button type="button" id="cancel-prompt"
+              class="px-4 py-2 bg-surface rounded-lg hover:bg-opacity-80 transition-all">Cancel</button>
+            <button type="submit"
+              class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification"
+    class="fixed bottom-4 right-4 max-w-md p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-y-20 opacity-0 z-50">
+  </div>
+
+  <script src="library.js"></script>
+</body>
+
+</html>

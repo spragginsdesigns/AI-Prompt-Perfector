@@ -1,0 +1,19 @@
+# Environment variables and config
+.env
+config.js
+config.*.js
+
+# Dependencies
+node_modules/
+
+# Build files
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -329,6 +329,131 @@ async function perfectPrompt() {
 	}
 }
 
+// Save to Library Function
+async function saveToLibrary() {
+	const promptContent = document.getElementById("result").textContent;
+	const originalPrompt = document.getElementById("prompt").value;
+	const outputFormat = document.querySelector(
+		'input[name="output-format"]:checked'
+	).value;
+
+	if (!promptContent) {
+		showNotification("No perfected prompt to save", "error");
+		return;
+	}
+
+	try {
+		const modal = document.createElement("div");
+		modal.className =
+			"fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center";
+		modal.innerHTML = `
+			<div class="glass-effect rounded-xl p-6 m-4 max-w-md w-full animate-fade-in">
+				<h3 class="text-xl font-semibold mb-4">Save to Prompt Library</h3>
+				<div class="space-y-4">
+					<div>
+						<label class="block mb-2">Title</label>
+						<input type="text" id="prompt-title" class="w-full p-3 bg-surface rounded-lg border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent"
+							placeholder="Enter a title for your prompt">
+					</div>
+					<div>
+						<label class="block mb-2">Description</label>
+						<textarea id="prompt-description" rows="2" class="w-full p-3 bg-surface rounded-lg border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent"
+							placeholder="Enter a description"></textarea>
+					</div>
+					<div>
+						<label class="block mb-2">Tags (comma separated)</label>
+						<input type="text" id="prompt-tags" class="w-full p-3 bg-surface rounded-lg border border-gray-700 focus:border-accent focus:ring-1 focus:ring-accent"
+							placeholder="ai, chatgpt, etc">
+					</div>
+				</div>
+				<div class="flex justify-end space-x-3 mt-6">
+					<button id="cancel-save" class="px-4 py-2 bg-surface rounded-lg hover:bg-opacity-80 transition-all">Cancel</button>
+					<button id="confirm-save" class="px-4 py-2 bg-accent rounded-lg hover:bg-opacity-80 transition-all">Save</button>
+				</div>
+			</div>
+		`;
+
+		document.body.appendChild(modal);
+
+		const closeModal = () => {
+			modal.classList.add("animate-fade-out");
+			setTimeout(() => document.body.removeChild(modal), 200);
+		};
+
+		modal.querySelector("#cancel-save").addEventListener("click", closeModal);
+
+		modal.querySelector("#confirm-save").addEventListener("click", async () => {
+			const saveButton = modal.querySelector("#confirm-save");
+			const originalText = saveButton.innerHTML;
+
+			try {
+				saveButton.disabled = true;
+				saveButton.innerHTML =
+					'<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+
+				const title = modal.querySelector("#prompt-title").value.trim();
+				const description = modal
+					.querySelector("#prompt-description")
+					.value.trim();
+				const tags = modal
+					.querySelector("#prompt-tags")
+					.value.split(",")
+					.map((tag) => tag.trim())
+					.filter(Boolean);
+
+				if (!title) {
+					showNotification("Please enter a title", "error");
+					return;
+				}
+
+				// Validate content length
+				if (promptContent.length > 10000) {
+					// Add reasonable limit
+					showNotification(
+						"Prompt content is too long (max 10000 characters)",
+						"error"
+					);
+					return;
+				}
+
+				// Validate and clean tags
+				const cleanedTags = tags.map((tag) =>
+					tag.toLowerCase().replace(/[^a-z0-9-]/g, "-")
+				);
+
+				const promptData = {
+					title,
+					description: description || null, // Handle empty description
+					content: promptContent,
+					tags: cleanedTags, // Now properly formatted as array
+					format: outputFormat,
+					original_prompt: originalPrompt,
+					author: localStorage.getItem("lastAuthor") || "Anonymous",
+					updated_at: new Date().toISOString() // Add updated_at timestamp
+				};
+
+				const { data, error } = await window.supabase
+					.from("prompts")
+					.insert([promptData])
+					.select();
+
+				if (error) throw error;
+
+				showNotification("Prompt saved to library successfully!", "success");
+				closeModal();
+			} catch (error) {
+				console.error("Error saving to library:", error);
+				showNotification("Failed to save prompt to library", "error");
+				saveButton.disabled = false;
+				saveButton.innerHTML = originalText;
+			}
+		});
+	} catch (error) {
+		console.error("Error:", error);
+		showNotification("Failed to save prompt to library", "error");
+	}
+}
+
 // Event Listeners
 document.addEventListener("DOMContentLoaded", () => {
 	const apiKeyInput = document.getElementById("api-key");
@@ -397,4 +522,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			showNotification("Failed to copy text. Please try again.", "error");
 		}
 	});
+
+	// Add save to library button listener
+	document
+		.getElementById("save-to-library")
+		.addEventListener("click", saveToLibrary);
 });

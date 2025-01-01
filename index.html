@@ -4,11 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Prompt Perfector is a tool that helps you improve your prompts for AI models.">
+  <meta name="author" content="Austin Spraggins">
   <title>AI Prompt Perfector</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="icon" type="image/ico" href="favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -102,6 +106,9 @@
         },
       },
     }
+
+    // Initialize Supabase client
+    window.supabase = supabase.createClient(window.config.supabaseUrl, window.config.supabaseKey);
   </script>
 </head>
 
@@ -110,9 +117,19 @@
 
   <header class="relative z-10 p-6 glass-effect">
     <div class="container mx-auto flex items-center justify-between">
-      <h1 class="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
-        AI Prompt Perfector
-      </h1>
+      <div class="flex items-center space-x-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">
+          AI Prompt Perfector
+        </h1>
+        <nav class="flex space-x-4">
+          <a href="index.html" class="px-4 py-2 rounded-lg bg-surface transition-colors">
+            <i class="fas fa-magic mr-2"></i>Perfector
+          </a>
+          <a href="library.html" class="px-4 py-2 rounded-lg hover:bg-surface transition-colors">
+            <i class="fas fa-book mr-2"></i>Library
+          </a>
+        </nav>
+      </div>
       <a href="https://spragginsdesigns.xyz" target="_blank" class="text-sm hover:text-accent transition-colors">
         by Austin Spraggins
       </a>
@@ -190,9 +207,14 @@
             <button id="regenerate-prompt" class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-80 transition-all">
               <i class="fas fa-sync-alt mr-2"></i>Regenerate
             </button>
-            <button id="copy-result" class="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-80 transition-all">
-              <i class="fas fa-copy mr-2"></i>Copy
-            </button>
+            <div class="flex space-x-2">
+              <button id="save-to-library" class="px-4 py-2 bg-accent rounded-lg hover:bg-opacity-80 transition-all">
+                <i class="fas fa-save mr-2"></i>Save to Library
+              </button>
+              <button id="copy-result" class="px-4 py-2 bg-secondary rounded-lg hover:bg-opacity-80 transition-all">
+                <i class="fas fa-copy mr-2"></i>Copy
+              </button>
+            </div>
           </div>
         </div>
         <div id="loader" class="hidden h-full flex flex-col items-center justify-center">
